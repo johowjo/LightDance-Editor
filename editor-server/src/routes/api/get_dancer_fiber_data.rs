@@ -99,7 +99,7 @@ pub async fn get_dancer_fiber_data(
     .await
     .into_result()?;
 
-    // create hasmap for color
+    // create hashmap for color
     let mut color_map: HashMap<i32, Color> = HashMap::new();
     for color in colors.iter() {
         color_map.insert(
