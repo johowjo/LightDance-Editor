@@ -2,7 +2,8 @@
 use std::collections::HashMap;
 use std::sync::OnceLock;
 
-static CHANNEL_MAP: OnceLock<HashMap<String, i32>> = OnceLock::new();
+static CHANNEL_ID_MAP: OnceLock<HashMap<String, i32>> = OnceLock::new();
+static CHANNEL_NAME_MAP: OnceLock<HashMap<i32, String>> = OnceLock::new();
 
 pub struct ChannelTable;
 
@@ -57,20 +58,33 @@ impl ChannelTable {
 
         let part_id = vec![
             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
-            24, 25, 26, 27, 28, 30, 31, 32, 33, 34, 35, 36, 37, 38, 0, 1, 2, 3, 4, 5, 6,
+            24, 25, 26, 27, 28, 30, 31, 32, 33, 34, 35, 36, 37, 38, 40, 41, 42, 43, 44, 45, 46,
         ];
 
-        CHANNEL_MAP.get_or_init(|| {
+        CHANNEL_ID_MAP.get_or_init(|| {
             HashMap::from_iter(
                 part_name
-                    .into_iter()
-                    .zip(part_id)
-                    .map(|(name, id)| (name.to_string(), id)),
+                    .iter()
+                    .zip(part_id.iter())
+                    .map(|(name, id)| (name.to_string(), *id)),
+            )
+        });
+
+        CHANNEL_NAME_MAP.get_or_init(|| {
+            HashMap::from_iter(
+                part_name
+                    .iter()
+                    .zip(part_id.iter())
+                    .map(|(name, id)| (*id, name.to_string())),
             )
         });
     }
 
     pub fn get_part_id(name: &String) -> Option<i32> {
-        CHANNEL_MAP.get().unwrap().get(name).copied()
+        CHANNEL_ID_MAP.get().unwrap().get(name).copied()
+    }
+
+    pub fn get_part_name(id: i32) -> Option<String> {
+        CHANNEL_NAME_MAP.get().unwrap().get(&id).cloned()
     }
 }

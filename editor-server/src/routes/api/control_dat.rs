@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use axum::{
     http::{HeaderMap, HeaderValue, StatusCode},
     response::Json,
@@ -12,6 +14,7 @@ use crate::global::{self, channel_table::ChannelTable};
 type GetDataResponse = Vec<u8>;
 
 const VERSION: [u8; 2] = [0, 0];
+const TOTAL_OF_NUM: i32 = 40;
 
 pub async fn control_dat(
     query: Json<GetControlDatQuery>,
@@ -38,6 +41,20 @@ pub async fn control_dat(
     // TODO: find cleaner way for this
     of_parts.sort_unstable_by_key(|part| ChannelTable::get_part_id(&part.0).unwrap_or(-1));
     led_parts.sort_unstable_by_key(|part| ChannelTable::get_part_id(&part.0).unwrap_or(-1));
+
+    let of_parts_filter: HashSet<String> =
+        HashSet::from_iter(of_parts.iter().map(|(name, _)| name.clone()));
+
+    for i in 0..TOTAL_OF_NUM {
+        if let Some(name) = ChannelTable::get_part_name(i) {
+            if of_parts_filter.contains(&name) {
+                response.push(1);
+                continue;
+            }
+        }
+
+        response.push(0);
+    }
 
     let of_num: u8 = of_parts.len().try_into().map_err(|_| {
         (

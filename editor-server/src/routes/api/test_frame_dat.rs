@@ -54,11 +54,10 @@ pub async fn test_frame_dat() -> Result<
     let mysql_pool = clients.mysql_pool();
 
     let dancer = "2_feng".to_string();
-    let mut of_parts = HashMap::new();
-    of_parts.insert("shirt_bottom_bottom".to_string(), 1);
+    let of_parts = HashMap::new();
 
     let mut led_parts = HashMap::new();
-    led_parts.insert("mask_LED".to_string(), LEDPart { id: 1, len: 28 });
+    led_parts.insert("mask_LED".to_string(), LEDPart { id: 40, len: 28 });
 
     let mut of_parts = Vec::from_iter(of_parts.into_iter());
     let mut led_parts = Vec::from_iter(led_parts.into_iter());
@@ -68,11 +67,6 @@ pub async fn test_frame_dat() -> Result<
     // TODO: find cleaner way for this
     of_parts.sort_unstable_by_key(|part| ChannelTable::get_part_id(&part.0).unwrap_or(-1));
     led_parts.sort_unstable_by_key(|part| ChannelTable::get_part_id(&part.0).unwrap_or(-1));
-
-    // let mut of_parts = Vec::from_iter(of_parts.into_iter().map(|(name, id)| (name, id)));
-    // of_parts.sort_unstable_by_key(|part| part.1);
-    //
-    // let of_parts: Vec<String> = Vec::from_iter(of_parts.into_iter().map(|(name, _)| name));
 
     let colors = sqlx::query!(
         r#"
@@ -262,6 +256,8 @@ pub async fn test_frame_dat() -> Result<
     .fetch_all(mysql_pool)
     .await
     .into_result()?;
+
+    println!("{:?}", led_effect_data);
 
     // TODO: don't use unwrap down there
     for data in led_effect_data {
