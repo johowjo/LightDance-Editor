@@ -398,8 +398,6 @@ pub async fn upload_data(
                 let model_name = &data_obj.dancer[i].model;
                 let real_dancer = &all_dancer[dancer_name];
 
-                println!("{:?}", real_dancer.1);
-
                 for (j, (part_status, part_led_status)) in dancer_status
                     .iter()
                     .zip(dancer_led_status.iter())
